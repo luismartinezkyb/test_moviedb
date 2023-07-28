@@ -1,52 +1,13 @@
 import React, {useState} from 'react'
 import axios from 'axios';
+import { generateError } from '../utils/errors/alerts';
 
 
 
-export default function Table() {
-    const API_URL = import.meta.env.VITE_URL_API;
+export default function Table( {handleChange, onSubmit, input}) {
     
-    const [input, setInput] = useState('')
-    const [movies, setMovies] = useState([]);
-
-    const getData = (name) => {
-        axios.get(`${URL_API}search?name=${name}&offset=0&limit=${limit}`)
-        .then(response => {
-            console.log(response.data)
-            // setMovies(response.data)
-            // setLoader(false)
-
-        })
-        .catch(error => {
-            console.log(error)
-            generateError('Something went wrong with the request')
-        })
-    }
-
-    const onSubmit = (e) => {
-        e.preventDefault();
-        console.log('hey')
-    }
-
-    const handleChange = (e) => {
-        const title = e.target.value;
-        setInput(title)
-        if(title.length===0){
-            
-            setShowModal(false)
-            getData('')
-            return;
-        }
-        setShowModal(true)
-        axios.get(`${URL_API}search?name=${name}&limit=5`)
-        .then(response => {
-            setModalData(response.data)
-        })
-        .catch(error => {
-            console.log(error)
-            generateError('Something went wrong with the request')
-        })
-    }
+    
+    
     return (
         <>
             <form className='m-2' onSubmit={onSubmit}>   
@@ -62,15 +23,14 @@ export default function Table() {
                     value={input}
                     onChange={handleChange}
                     id="default-search" 
-                    className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 " placeholder="Search..." />
+                    className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50  " placeholder="Search..." />
                     <button 
                     type="submit" 
                     className="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Search</button>
                 </div>
                 
             </form>
-            <div>
-            </div>
+            
         </>
     )
 }

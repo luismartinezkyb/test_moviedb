@@ -5,14 +5,20 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "app": "npm dev client",
-    "server": "npm start -w server"
+    "client": "npm run --prefix client dev",
+    "server": "npm start -w server",
+    "install-server": "npm i server",
+    "install-client": "npm i client"
   },
-  "workspaces":[
+  "workspaces": [
     "server",
     "client"
   ],
   "keywords": [],
   "author": "Luis Martinez",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "client": "^0.0.0",
+    "server": "^1.0.0"
+  }
 }

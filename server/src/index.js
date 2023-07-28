@@ -1,6 +1,7 @@
 //imports
 import express from 'express';
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
+import cors from 'cors';
 dotenv.config()
 import movieRoutes from './routes/movies.js';
 
@@ -11,7 +12,7 @@ const port = process.env.PORT || 3001;
 const app = express();
 
 //middlewares
-
+app.use(cors());
 //routes
 app.use('/api/movies', movieRoutes);
 

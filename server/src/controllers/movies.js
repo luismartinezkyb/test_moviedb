@@ -8,9 +8,8 @@ const {API_KEY, API_URL } = process.env;
 
 const getMovies = async(req, res)=>{
     try {
-        
-        console.log(API_KEY, API_URL);
-        const url = `${API_URL}movie/popular?api_key=${API_KEY}`;
+        const {page} = req.query || 1;
+        const url = `${API_URL}movie/popular?api_key=${API_KEY}&page=${page}`;
         const response = await fetch(url);
         const data = await response.json();
         if(!response){
@@ -50,7 +49,6 @@ const getMovieById = async(req, res)=>{
 
 const getMovieByTitle = async(req, res)=>{
     try {
-        //https://api.themoviedb.org/3/search/movie?query=shazam&api_key=296e298be8c968bec1cc19a88801cb0a
         const {title} = matchedData(req)
         const url = `${API_URL}search/movie?query=${title}&api_key=${API_KEY}`;
         const response = await fetch(url);

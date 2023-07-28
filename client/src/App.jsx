@@ -1,12 +1,14 @@
 
 import Rutas from './routes/Routes';
 import Navbar from './components/partials/Navbar';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function App() {
   
 
   return (
-    <div className="App">
+    <div className="App ">
       <Navbar/>
       <Rutas/>
       
