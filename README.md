@@ -1,4 +1,8 @@
-#Test Movie DB Luis Martinez
+# Test Movie DB Luis Martinez
+
+Tienes que clonar el repositorio en tu computadora y tener instalado npm 
+First you need to clone the repository and You must have installed npm to run this project
+
 
 ## ES - instrucciones
 
