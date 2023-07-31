@@ -1,8 +1,9 @@
-import {check, param} from 'express-validator'
+import {check, param, query} from 'express-validator'
 import { validateResults } from '../utils/handleValidator.js'
 
 const validatorMoviesByTitle =[
     param('title').exists().notEmpty(),
+    query('page').default(1).isInt(),
     (req, res, next)=> validateResults(req, res, next)
 ]
 

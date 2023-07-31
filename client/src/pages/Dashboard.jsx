@@ -5,29 +5,37 @@ import axios from 'axios'
 import { generateError } from '../utils/errors/alerts';
 import Movie from '../components/Movie';
 import Loader from '../components/partials/Loader'
+import { useNavigate } from 'react-router-dom';
 
 
 export default function Dashboard() {
   const API_URL = import.meta.env.VITE_URL_API;
   const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0);
   const [loader, setLoader] = useState(true)
   const [movies, setMovies] = useState([]);
   const [input, setInput] = useState('')
+  const navigate = useNavigate();
   const [showModal, setShowModal]= useState(false);
   const [modalData, setModalData] = useState([]);
-    
-
+  
+  
   const onSubmit = (e) => {
       e.preventDefault();
-      //buscar al usuario
+      setShowModal(false)
+      getMoviesByTitle(input)
+      
   }
 
 
   const getMovies = () => {
-    axios.get(`${API_URL}api/movies?page=${currentPage}`)
+    const queryParams = new URLSearchParams(location.search);
+    let pageLocation = queryParams.get('page') ? queryParams.get('page') : 1;
+    setCurrentPage(parseInt(pageLocation))
+    axios.get(`${API_URL}api/movies?page=${pageLocation}`)
     .then(response => {
-        
         setMovies(response.data.results)
+        setTotalPages(response.data.total_pages);
         setLoader(false);
     })
     .catch(error => {
@@ -35,33 +43,65 @@ export default function Dashboard() {
         generateError('Something went wrong with the request')
     })
   }
-
-  
+  const getMoviesByTitle=(name)=>{
+    navigate(`?page=${currentPage}`)
+    axios.get(`${API_URL}api/movies/title/${name}?page=${currentPage}`)
+    .then(response => {
+      console.log(response.data)
+      if(response.data.results.length===0){
+        generateError('There is no movies with that title')
+        getMovies()
+      }else{
+        setMovies(response.data.results)
+        setTotalPages(response.data.total_pages);
+      }
+      
+      
+    })
+    .catch(error => {
+        console.log(error)
+        if(error.response.data.error){
+          generateError(error.response.data.error)
+        }else{
+          generateError('Something went wrong with the request')
+        }
+        
+    })
+  }
 
   const handleTab = (value) => {
     if(value === 0){
         setCurrentPage(currentPage-1)
-        
+        navigate(`?page=${currentPage-1}`);
     }else{
         setCurrentPage(currentPage+1)
+        navigate(`?page=${currentPage+1}`);
     }
+
   } 
   useEffect(() =>{
-    getMovies();
+    if(input.length===0){
+      getMovies();
+    }else{
+      getMoviesByTitle(input);
+    }
   }, [currentPage])
 
   const handleChange = (e) => {
     const title = e.target.value;
+    setCurrentPage(1);
     setInput(title)
     if(title.length===0){
+        
         setShowModal(false)
         getMovies();
         return;
     }
     setShowModal(true)
     if(title.length%2==0){
-      axios.get(`${API_URL}api/movies/title/${title}?page=${currentPage}`)
+      axios.get(`${API_URL}api/movies/title/${title}`)
       .then(response => {
+          
           setModalData(response.data.results)
       })
       .catch(error => {
@@ -73,17 +113,9 @@ export default function Dashboard() {
   }
   const handleAutosuggest = (name) => {
     setInput(name)
-    console.log(name)
     setShowModal(false)
-
-    axios.get(`${API_URL}api/movies/title/${name}?page=${currentPage}`)
-    .then(response => {
-        setMovies(response.data.results)
-    })
-    .catch(error => {
-        console.log(error)
-        generateError('Something went wrong with the request')
-    })
+    
+    getMoviesByTitle(name)
   }
 
   return (
@@ -115,16 +147,18 @@ export default function Dashboard() {
       {
         loader ? <Loader w={20}/> :
         <>
-          <Options currentPage={currentPage} handleTab={handleTab}/>
+          <Options currentPage={currentPage} handleTab={handleTab} totalPages={totalPages}/>
 
-          <div className="m-5 mt-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
-            {movies.map(movie=>{
+          <div className="m-5 mt-10 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
+          {
+                        movies.length===0 ? <h1 className='text-black font-bold text-xl'>Movie not exists</h1>
+                        :movies.map(movie=>{
               return (
                 <Movie key={movie.id} movie={movie}/>
               )
             })}
           </div>
-          <Options currentPage={currentPage} handleTab={handleTab}/>
+          <Options currentPage={currentPage} handleTab={handleTab} totalPages={totalPages}/>
         </>
       }
       <ToastContainer/>
@@ -132,10 +166,10 @@ export default function Dashboard() {
   )
 }
 
-export function Options({currentPage, handleTab}){
+export function Options({currentPage, handleTab, totalPages}){
   return (
     <nav className="flex items-center justify-between pt-4 m-5" aria-label="Table navigation">
-      <span className="text-sm font-normal text-gray-500">Showing <span className="font-semibold text-gray-900">{currentPage}</span> of <span className="font-semibold text-gray-900 "></span></span>
+      <span className="text-sm font-normal text-gray-500">Showing <span className="font-semibold text-gray-900">{currentPage}</span> of <span className="font-semibold text-gray-900 ">{totalPages}</span></span>
       <ul className="inline-flex -space-x-px text-sm h-8">
           
         {currentPage-1!==0 &&(
@@ -150,12 +184,16 @@ export function Options({currentPage, handleTab}){
         <li>
             <a  className={`text-blue-600 border bg-blue-50 flex items-center justify-center px-3 h-8  border-gray-300  hover:bg-blue-100 hover:text-blue-700 `}>{currentPage}</a>
         </li>
+        {totalPages-currentPage>0&&
         <li>
             <a onClick={()=>handleTab(1)}  className={`text-gray-500 bg-white border flex items-center justify-center px-3 h-8  border-gray-300  hover:bg-blue-100 hover:text-blue-700 `}>{currentPage+1}</a>
         </li>
+        }
+        {totalPages>1 &&
         <li>
-            <a onClick={()=>handleTab(1)} className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700">Next</a>
-          </li>
+          <a onClick={()=>handleTab(1)} className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700">Next</a>
+        </li>
+        }
       </ul>
     </nav>
   )

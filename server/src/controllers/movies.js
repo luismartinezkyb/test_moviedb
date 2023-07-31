@@ -49,8 +49,10 @@ const getMovieById = async(req, res)=>{
 
 const getMovieByTitle = async(req, res)=>{
     try {
-        const {title} = matchedData(req)
-        const url = `${API_URL}search/movie?query=${title}&api_key=${API_KEY}`;
+        
+        const {title, page} = matchedData(req)
+
+        const url = `${API_URL}search/movie?query=${title}&api_key=${API_KEY}&page=${page}`;
         const response = await fetch(url);
         
         if(!response.ok){

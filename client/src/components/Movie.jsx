@@ -1,9 +1,12 @@
 import {useState} from 'react'
 import PropTypes from 'prop-types';
 import Loader from './partials/Loader'
+import no_image from '../assets/no_image.jpg';
 import styles from '../style';
+import { Link } from 'react-router-dom';
 export default function Movie({movie}) {
-    const pathImg = 'https://image.tmdb.org/t/p/original';
+    const PATH_IMG = import.meta.env.VITE_PATH_IMG;
+    
     const {
         adult,
         backdrop_path,
@@ -29,19 +32,24 @@ export default function Movie({movie}) {
             <div className="group hover:-translate-y-6 mb-7 hover:relative  relative w-full flex flex-col rounded-xl bg-white  bg-clip-border text-gray-700 shadow-md">
                 <div className="group-hover:hidden group-hover:-z-10 group-hover:opacity-40 relative overflow-hidden rounded-xl bg-white bg-clip-border text-gray-700">
                     <img
-                    src={`${pathImg}${poster_path}`}
+                    src={`${PATH_IMG}${poster_path}`}
                     alt={original_title}
                     className=" h-full w-full object-contain"
                     style={{ display: loading ? 'none' : 'block', width: '100%', height: '100%' }}
                     onLoad={handleImageLoad}
                     />
                     {loading &&
-                        <Loader w={20}/>
+                        <img
+                        src={no_image}
+                        alt={original_title}
+                        className=" h-full w-full object-contain"
+                        
+                        />
                     }
                     
                 </div>
                 
-                <div className="group-hover:mt-4 p-2 rounded-md ">
+                <div className="group-hover:mt-4 p-2 rounded-md group-hover:overflow-y-auto group-hover:max-h-[300px]">
                     <div className="mb-2 flex flex-col items-center justify-between">
                         <p className={`block group-hover:hidden font-sans text-base font-medium leading-relaxed text-blue-gray-900 antialiased `}>
                             {title} 
@@ -49,14 +57,12 @@ export default function Movie({movie}) {
                         <span className="bg-purple-100 text-purple-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-purple-900 dark:text-purple-300">{release_date}</span>
                     </div>
                     
-                    <p className="block group-hover:hidden font-sans text-sm font-normal leading-normal text-gray-700 antialiased opacity-75">
-                        {overview.split(' ').splice(0, 10).join(' ')} <span></span>
-                    </p>
+                    
                     {overview.length!==0 ? <>
-                        <p className="block group-hover:hidden font-sans text-sm font-normal leading-normal text-gray-700 antialiased opacity-75">
+                        <p className={`block group-hover:hidden ${styles.paragraph}`}>
                         {overview.split(' ').splice(0, 7).join(' ')}...
                         </p>
-                        <p className="hidden group-hover:block font-sans text-sm font-normal leading-normal text-black antialiased opacity-75">
+                        <p className={`hidden group-hover:block ${styles.paragraph}`}>
                             {overview} <span></span>
                         </p>
                     </>: 
@@ -65,12 +71,12 @@ export default function Movie({movie}) {
                     }
                 </div>
                 <div className="hidden group-hover:block p-2 pt-0 mb-auto ">
-                    <button
-                    className=" w-full select-none rounded-lg bg-primary  py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-white transition-all hover:scale-105 focus:scale-105 focus:opacity-[0.85] active:scale-100 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                    <Link to={`/movie/${id}`}><button
+                    className={styles.buttonExpand}
                     type="button"
                     >
                     Details
-                    </button>
+                    </button></Link>
                 </div>
             </div>
         </>
