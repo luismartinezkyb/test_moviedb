@@ -8,7 +8,7 @@
     "client": "npm run --prefix client dev",
     "server": "npm start -w server",
     "install-server": "npm i server",
-    "install-client": "npm i client"
+    "install-client": "npm i --prefix client"
   },
   "workspaces": [
     "server",
